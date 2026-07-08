@@ -1,0 +1,4 @@
+interface:
+  display_name: "oF Shader GLSL"
+  short_description: "Write and debug openFrameworks GLSL shaders with correct texture targets, UVs, FBOs, and uniforms."
+  default_prompt: "Use $of-shader-glsl to write, port, or debug this openFrameworks shader or ofShader texture/FBO binding code using local source-backed guidance."

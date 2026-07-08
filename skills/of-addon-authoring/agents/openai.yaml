@@ -1,0 +1,4 @@
+interface:
+  display_name: "oF Addon Authoring"
+  short_description: "Author robust cross-platform oF addons"
+  default_prompt: "Use $of-addon-authoring to create or fix this openFrameworks addon."

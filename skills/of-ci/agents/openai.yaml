@@ -1,0 +1,4 @@
+interface:
+  display_name: "oF CI"
+  short_description: "Create grounded GitHub Actions and ofxUnitTests CI for openFrameworks."
+  default_prompt: "Use $of-ci to add or review GitHub Actions CI and ofxUnitTests for this openFrameworks app or addon."

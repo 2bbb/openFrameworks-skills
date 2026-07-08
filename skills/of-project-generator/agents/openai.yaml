@@ -1,0 +1,4 @@
+interface:
+  display_name: "oF Project Generator"
+  short_description: "Create and update oF project files"
+  default_prompt: "Use $of-project-generator to safely create or regenerate this openFrameworks project."

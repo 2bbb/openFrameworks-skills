@@ -1,0 +1,4 @@
+interface:
+  display_name: "oF Platform Config"
+  short_description: "Configure openFrameworks platform and addon build settings."
+  default_prompt: "Use $of-platform-config to review or update this openFrameworks project's platform-specific Project Generator, addons.make, and addon_config.mk settings."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "openFrameworks"
+  short_description: "Build and debug openFrameworks code"
+  default_prompt: "Use $of-openframeworks to implement or debug this openFrameworks app/addon safely."
