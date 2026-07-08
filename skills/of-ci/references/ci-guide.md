@@ -125,7 +125,8 @@ jobs:
         run: make -C "$TEST_APP" -j2 Debug OF_ROOT="$OF_ROOT"
       - name: Run test app
         run: |
-          exe="$TEST_APP/bin/${TEST_APP}_debug"
+          app_name="$(basename "$TEST_APP")"
+          exe="$TEST_APP/bin/${app_name}_debug"
           if command -v xvfb-run >/dev/null 2>&1 && [ -z "${DISPLAY:-}" ]; then
             xvfb-run "$exe"
           else
