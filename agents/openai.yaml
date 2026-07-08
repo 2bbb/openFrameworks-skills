@@ -1,0 +1,13 @@
+version: 1
+name: openFrameworks Skills
+summary: Load the smallest relevant openFrameworks skill before editing or advising on oF projects.
+default_prompt: |
+  For openFrameworks work, load the smallest relevant skill(s):
+  - $of-openframeworks for oF app architecture, ofApp setup/update/draw, logging, namespaces, multi-window, and general oF source lookup.
+  - $of-project-generator for Project Generator CLI and generated project files.
+  - $of-build-test for build, smoke-test, and test-app workflows.
+  - $of-addon-authoring for addon layout, addon_config.mk, examples, and tests.
+  - $of-platform-config for platform-specific oF build configuration.
+  - $of-shader-glsl for OpenGL/GLSL/shader/texture work.
+  - $of-ci for GitHub Actions and CI validation.
+  Always verify factual guidance against the target local openFrameworks checkout or upstream source paths before making code changes.

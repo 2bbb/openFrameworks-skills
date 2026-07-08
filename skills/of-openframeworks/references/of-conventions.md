@@ -4,6 +4,7 @@ Use local source as the authority for signatures, names, and ownership. These no
 
 ## API and app shape
 
+- For `ofApp`, `setup/update/draw`, namespace, multi-window, and logging guidance, load `app-architecture.md` first.
 - Template app files use an `ofApp` class with `setup()`, `update()`, `draw()`, and event callbacks such as `keyPressed`, `mouseDragged`, and `windowResized`. Source: `openFrameworks/examples/templates/emptyExample/src/ofApp.h`.
 - Core and addon classes commonly use `of`/`ofx` prefixes (`ofTexture`, `ofFbo`, `ofxOsc`, etc.). Sources: `openFrameworks/libs/openFrameworks/`, `openFrameworks/addons/`.
 - Prefer examples near the target feature before inventing a new pattern; examples are organized by topic and intended as small demonstrations. Source: `openFrameworks/examples/README.md`.
@@ -15,7 +16,7 @@ Use local source as the authority for signatures, names, and ownership. These no
 
 ## Logging and diagnostics
 
-- The oF source uses `ofLogNotice`, `ofLogWarning`, and `ofLogError` throughout core code. Source: `openFrameworks/libs/openFrameworks/`.
+- The oF source and `ofLogExample` use `ofLogNotice`, `ofLogWarning`, `ofLogError`, `ofSetLogLevel`, `ofLogToFile`, and `ofLogToConsole`. Sources: `openFrameworks/libs/openFrameworks/`, `openFrameworks/examples/strings/ofLogExample/src/ofApp.cpp`, `openFrameworks/libs/openFrameworks/utils/ofLog.h`.
 
 Example style:
 
