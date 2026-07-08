@@ -5,7 +5,7 @@ Source basis:
 - `projectGenerator/commandLine/src/main.cpp` parses `addons.make` when updating a project (around `updateProject`).
 - `projectGenerator/commandLine/src/projects/baseProject.cpp` reads `projectDir/addons.make` in `parseAddons()` and sends each non-comment line to `addAddon()`.
 - `projectGenerator/commandLine/src/addons/ofAddon.cpp` loads addon sources from `<addon>/src`, include folders from `<addon>/src` and `<addon>/libs`, and libraries/frameworks from `<addon>/libs`.
-- `of-skill/addon-guide.md` documents the repo-local addon layout and testApp conventions.
+- Bundled addon directories under `openFrameworks/addons/ofx*` provide source-backed addon layout examples; test apps and examples in `openFrameworks/tests/` show buildable project layout.
 
 ## Recommended Tree
 

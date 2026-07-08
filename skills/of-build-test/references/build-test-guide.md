@@ -4,10 +4,8 @@
 
 This guide is grounded only in the following local evidence:
 
-- `working-docs/PLAN.md`: target skill coverage includes build/run/test commands, stdout/stderr capture, `ofSaveScreen`/`ofSaveImage`, ofxUnitTests, and CI tips.
-- `of-skill/SKILL.md`: oF conventions and reference routing.
-- `of-skill/gotchas.md`: oF build system reads `addons.make`; macOS built app executable path is `bin/{AppName}.app/Contents/MacOS/{AppName}`; Linux CI needs `xvfb-run` for apps that create a window.
-- `of-skill/addon-guide.md`: standard addon/test app layout, Makefile wrapper, `addons.make`, and ofxUnitTests pattern.
+- `openFrameworks/scripts/templates/*/Makefile`, `openFrameworks/scripts/ci/linux64/run_tests.sh`, and `openFrameworks/scripts/ci/macos/run_tests.sh`: source-backed make/test execution patterns.
+- `openFrameworks/addons/ofxUnitTests/src/ofxUnitTests.h`, `openFrameworks/tests/*/*/src/main.cpp`, and bundled addon/project templates: source-backed test app and addon project patterns.
 - `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk`: default goal is `Release`; supported targets include `Release`, `Debug`, `run`, `RunRelease`, `RunDebug`, `ReleaseNoOF`, `DebugNoOF`; `run` dispatches platform run command.
 - `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/config.project.mk`: default `OF_ROOT=../../..`; `addons.make` is read from project root; project sources are found under `src`; Debug adds `-DDEBUG`, Release adds `-DNDEBUG`.
 - `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/config.shared.mk`: platform detection maps Darwin to `osx` and Linux x86_64 to `linux64`.

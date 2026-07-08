@@ -14,7 +14,6 @@ When local source is available, prefer it over memory. Add source-path citations
 
 ## Additional local skill knowledge
 
-- `of-skill/SKILL.md`, `of-skill/addon-guide.md`, `of-skill/api-conventions.md`, `of-skill/gotchas.md` — existing skill knowledge. Treat it as secondary to oF source/docs unless it cites local source.
 
 ## Lookup strategy
 

@@ -17,6 +17,8 @@ FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("repo-local openFrameworks citation", re.compile(re.escape("reference" + "/" + "openFrameworks" + "/"))),
     ("repo-local projectGenerator citation", re.compile(re.escape("reference" + "/" + "projectGenerator" + "/"))),
     ("repo-local of-skill citation", re.compile(re.escape("reference" + "/" + "of-skill" + "/"))),
+    ("ignored working" + "-docs path", re.compile(re.escape("working" + "-docs" + "/"))),
+    ("unpackaged legacy of-skill path", re.compile(r"(?<!openFrameworks/addons/)" + "of" + "-skill" + "/")),
     ("placeholder marker", re.compile(r"\b(?:" + "TO" + "DO|FIX" + "ME|T" + "BD|X" + "XX)\b", re.IGNORECASE)),
 )
 

@@ -5,7 +5,7 @@ Source basis:
 - `projectGenerator/commandLine/src/addons/ofAddon.cpp` recursively discovers source from `src/` and `libs/`, then applies `ADDON_SOURCES_EXCLUDE` to `srcFiles`, C/C++/ObjC source lists, and headers.
 - `openFrameworks/addons/ofxiOS/src/ofxiOS.h` says files including it need `.mm` to support Objective-C++.
 - `openFrameworks/addons/ofxiOS/src/utils/ofxiOSExtras.h` and `openFrameworks/addons/ofxiOS/src/utils/ofxiOSExtras.mm` and other `ofxiOS` `.mm` files show ObjC++ implementation living in `.mm`.
-- `of-skill/gotchas.md` gives repo-local PIMPL guidance for hiding ObjC types from C++ headers.
+- `openFrameworks/addons/ofxiOS/src/utils/ofxiOSExtras.h` and `openFrameworks/addons/ofxiOS/src/utils/ofxiOSExtras.mm` show a public C++/Objective-C++ boundary in a bundled addon utility.
 
 ## Source Discovery Means Exclude Aggressively
 

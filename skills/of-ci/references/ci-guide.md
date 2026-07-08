@@ -4,9 +4,8 @@
 
 This guide is grounded only in the following local evidence:
 
-- `working-docs/PLAN.md`: requested coverage includes GitHub Actions CI and ofxUnitTests.
-- `of-skill/addon-guide.md`: standard addon layout, `addons.make`, Makefile wrapper, and ofxUnitTests setup.
-- `of-skill/gotchas.md`: `addons.make` is project-local; macOS executable path; Linux headless windowed apps need `xvfb-run`.
+- `openFrameworks/addons/ofxUnitTests/src/ofxUnitTests.h` and `openFrameworks/tests/*/*/src/main.cpp`: ofxUnitTests setup and no-window test app patterns.
+- `openFrameworks/scripts/templates/*/Makefile`, `openFrameworks/docs/projectgenerator.md`, and `openFrameworks/scripts/ci/*`: project-local build/test conventions and CI execution patterns.
 - `openFrameworks/.github/workflows/of.yml`: Linux job uses `ubuntu-24.04`, `actions/checkout@v6`, `hendrikmuhs/ccache-action@v1.2.23`, `awalsh128/cache-apt-pkgs-action@v1.6.0`, then downloads libs, installs dependencies, builds, and runs tests; macOS job uses `macos-15`, `actions/checkout@v6`, `hendrikmuhs/ccache-action@v1.2.23`, downloads libs, then runs `scripts/ci/osx/build.sh` or `scripts/ci/osx/run_tests.sh`.
 - `openFrameworks/.github/workflows/nightly.yml`: uses `ubuntu-24.04`, `actions/checkout@v4`, `hendrikmuhs/ccache-action@v1.2.14`, `awalsh128/cache-apt-pkgs-action@latest`, and release packaging commands. Prefer the newer exact versions from `of.yml` for new CI.
 - `openFrameworks/scripts/ci/linux64/install.sh`: installs Linux dependencies through `scripts/linux/ubuntu/install_dependencies.sh -y`.
@@ -152,7 +151,7 @@ jobs:
         run: make -C "$TEST_APP" RunDebug OF_ROOT="$OF_ROOT"
 ```
 
-Add explicit oF checkout/download/install steps based on repository policy; do not invent release URLs because local `of-skill/gotchas.md` says release asset names vary.
+Add explicit oF checkout/download/install steps based on repository policy; do not invent release URLs without checking the target openFrameworks release assets or an approved project-local download helper.
 
 ## Project generator in CI
 
