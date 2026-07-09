@@ -47,6 +47,16 @@ Use this when each window has its own app lifecycle and ownership. Keep cross-wi
 
 Use this when one app owns model/state and an auxiliary window is only another view/control surface. When touching OpenGL objects across windows, inspect whether `shareContextWith` is required in the target oF/GLFW setup.
 
+## Apple Objective-C++ boundaries
+
+For macOS/iOS/tvOS/visionOS code, prefer a C++ public surface and private Objective-C++ implementation:
+
+- `ofxiOS.h` says any `.cpp` file that includes it needs to be renamed to `.mm` for Objective-C++ support. Source: `openFrameworks/addons/ofxiOS/src/ofxiOS.h`.
+- AVFoundation-related oF headers expose C++ classes but guard Objective-C members with `__OBJC__` or present them as `void *` to non-ObjC translation units. Sources: `openFrameworks/libs/openFrameworks/video/ofAVFoundationPlayer.h`, `openFrameworks/libs/openFrameworks/video/ofAVFoundationGrabber.h`.
+- `ofAVEngineSoundPlayer.h` uses an Objective-C object alias only under `__OBJC__` and otherwise uses an opaque pointer-like type. Source: `openFrameworks/libs/openFrameworks/sound/ofAVEngineSoundPlayer.h`.
+
+Agent rule: unless the target is intentionally Apple-only, do not make users include Apple framework headers or Objective-C syntax from ordinary `ofApp.h`, addon public headers, or C++ examples. Use C++ wrappers, PIMPL, opaque handles, and `.mm` implementation files so consumers can treat the addon/app as normal C++.
+
 ## Logging and diagnostics
 
 Use oF logging helpers instead of ad-hoc `std::cout` for runtime diagnostics:
@@ -79,6 +89,7 @@ Good:
 - Start from the nearest oF example and the target checkout headers.
 - Keep `setup/update/draw` responsibilities clear.
 - Prefer `std::`/narrow `using std::name` over broad namespace imports.
+- Keep Apple Objective-C++ details out of public headers unless the API is intentionally Apple-only.
 - Use `ofLog*` with module names for diagnostics.
 - For multi-window, choose either separate app instances or one-app/listener pattern deliberately.
 - Verify generated project membership after adding new `.cpp` files.
@@ -87,6 +98,7 @@ Bad:
 
 - Inventing APIs from memory instead of checking `examples/` or `libs/openFrameworks/`.
 - Adding global `using namespace std;` to headers.
+- Leaking `#import`, `@interface`, `NSObject`, `id<...>`, or Apple framework handles into public C++ headers.
 - Moving asset loads or blocking work into `draw()` without a measured reason.
 - Sharing multi-window state through unmanaged globals when explicit ownership is available.
 - Assuming all window contexts share GL resources; check the example and target settings.

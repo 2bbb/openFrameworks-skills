@@ -27,6 +27,7 @@ Use this skill for openFrameworks (oF) app/addon implementation and debugging. G
 ## Guardrails
 
 - Do not add a project-wide `using namespace std;` as a convenience. oF itself still has legacy compatibility in `ofMain.h`, while the changelog records multiple removals/reductions of `using namespace std`; prefer `std::` or narrow `using std::name` in implementation files. Sources: `openFrameworks/libs/openFrameworks/ofMain.h`, `openFrameworks/CHANGELOG.md`.
+- On Apple platforms, keep public addon/app headers as pure C++ whenever possible; put Objective-C/Objective-C++ imports, delegates, native objects, and Apple framework details in `.mm` or private Apple-only implementation files. Sources: `openFrameworks/addons/ofxiOS/src/ofxiOS.h`, `openFrameworks/libs/openFrameworks/video/ofAVFoundationPlayer.h`, `openFrameworks/libs/openFrameworks/video/ofAVFoundationGrabber.h`, `openFrameworks/libs/openFrameworks/sound/ofAVEngineSoundPlayer.h`.
 - Do not confuse `addons.make` with `addon_config.mk`. Source: `openFrameworks/docs/msys2.md`, `openFrameworks/addons/ofx*/addon_config.mk`.
 - Do not treat oF project `Makefile`s as standalone build systems; template Makefiles include `libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk`. Source: `openFrameworks/scripts/templates/*/Makefile`.
 - For `addon_config.mk` exclusion globs, use `%` wildcard as documented in bundled addon configs. Source: `openFrameworks/addons/ofxAssimp/addon_config.mk`.
