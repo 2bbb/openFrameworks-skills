@@ -6,6 +6,7 @@ import ast
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,17 +95,70 @@ def validate_shell() -> None:
 
 
 def validate_help() -> None:
-    help_scripts = [
-        SKILLS / "of-build-test/scripts/of-build-run.sh",
-        SKILLS / "of-project-generator/scripts/locate_project_generator.py",
-        SKILLS / "of-ci/scripts/of-ci-template.sh",
-        SKILLS / "of-ci/scripts/validate_workflow.py",
-        SKILLS / "of-shader-glsl/scripts/check_shader_assets.py",
-        SKILLS / "of-openframeworks/scripts/check_source_citations.py",
-    ]
+    help_scripts = sorted(SKILLS.glob("*/scripts/*"))
     for path in help_scripts:
-        if path.exists():
-            run([str(path), "--help"])
+        if path.suffix == ".py":
+            run([sys.executable, str(path), "--help"])
+        elif path.suffix == ".sh":
+            run(["bash", str(path), "--help"])
+
+
+def validate_ci_templates() -> None:
+    script = SKILLS / "of-ci/scripts/of-ci-template.sh"
+    cases = [
+        (
+            [str(script), "--mode", "of-actions-addon", "--addon-name", "ofxExample"],
+            [
+                "uses: 2bbb/of-actions/.github/workflows/build-addon.yml@v3",
+                'addon_name: "ofxExample"',
+                'test_mode: "test"',
+            ],
+        ),
+        (
+            [str(script), "--mode", "of-actions-app", "--app-name", "exampleApp"],
+            [
+                "uses: 2bbb/of-actions/.github/workflows/build-app.yml@v3",
+                'app_name: "exampleApp"',
+                'test_mode: "build-only"',
+            ],
+        ),
+    ]
+    for cmd, expected in cases:
+        print("+", " ".join(cmd))
+        output = subprocess.run(cmd, cwd=ROOT, check=True, text=True, capture_output=True).stdout
+        for marker in expected:
+            if marker not in output:
+                fail(f"CI template output missing {marker!r}")
+
+
+def validate_platform_config_guard() -> None:
+    validator = SKILLS / "of-platform-config/scripts/validate_of_platform_config.py"
+    with tempfile.TemporaryDirectory() as temp_dir:
+        config = Path(temp_dir) / "addon_config.mk"
+        config.write_text(
+            "android/armeabi-v7a:\n"
+            "    ADDON_CFLAGS += -DARMV7\n"
+            "android/arm64-v8a:\n"
+            "    ADDON_CFLAGS += -DARM64\n",
+            encoding="utf-8",
+        )
+        valid_result = subprocess.run(
+            [sys.executable, str(validator), str(config)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        config.write_text("osx:\n    ADDON_XCFRAMEWORKS += libs/example.xcframework\n", encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(validator), str(config)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+    if valid_result.returncode != 0:
+        fail("platform config validator rejected verified hyphenated Android sections")
+    if result.returncode == 0 or "absent from projectGenerator's osx key whitelist" not in result.stderr:
+        fail("platform config validator did not reject unsupported osx ADDON_XCFRAMEWORKS")
 
 
 def validate_agents() -> None:
@@ -123,6 +177,8 @@ def main() -> int:
     validate_python()
     validate_shell()
     validate_help()
+    validate_ci_templates()
+    validate_platform_config_guard()
     validate_agents()
     run(["python3", "skills/of-openframeworks/scripts/check_source_citations.py"])
     print("OK: repository validation passed")

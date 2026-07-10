@@ -10,7 +10,7 @@ Codex skills for building, debugging, reviewing, and maintaining openFrameworks 
 - `of-addon-authoring` — addon layout, `addon_config.mk`, examples, tests, dependencies, and packaging.
 - `of-platform-config` — platform sections, generated config files, and platform-specific build settings.
 - `of-shader-glsl` — oF OpenGL/GLSL shader, texture, renderer, and asset checks.
-- `of-ci` — CI templates and validation flow for oF projects and skills.
+- `of-ci` — `2bbb/of-actions`, custom CI, ofxUnitTests, and validation flow for oF addons/apps and oF itself.
 
 ## Install
 
@@ -20,7 +20,7 @@ The mirrored source trees used to build these skills are intentionally not distr
 
 ## Example prompts
 
-See `examples/prompts/` for prompt snippets covering app architecture, build/test, Project Generator, addon authoring, and shaders.
+See `examples/prompts/` for prompt snippets covering app architecture, build/test, Project Generator, addon authoring, shaders, and CI.
 
 ## Validate
 

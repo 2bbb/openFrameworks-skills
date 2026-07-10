@@ -12,7 +12,7 @@ projectGenerator -o"/path/to/of" -a"ofxGui,ofxOsc" pathName
 projectGenerator --ofPath="/path/to/of" --addons="ofxGui,ofxOsc" pathName
 ```
 
-Windows command-line PG uses slash-style long flags and no abbreviations. Source: `projectGenerator/commandLine/readme.md`.
+The bundled command-line readme documents slash-style long flags and no abbreviations for Windows. Current source help descriptors advertise hyphen forms, and packaged versions can differ; run the exact executable's `--help` or `/help` before scripting Windows PG. Sources: `projectGenerator/commandLine/readme.md`, `projectGenerator/commandLine/src/main.cpp`.
 
 ```powershell
 projectGenerator.exe /ofPath="C:\openFrameworks" /addons="ofxGui,ofxOsc" pathName
@@ -20,7 +20,7 @@ projectGenerator.exe /ofPath="C:\openFrameworks" /addons="ofxGui,ofxOsc" pathNam
 
 ## Core options
 
-| Unix | Windows | Purpose | Source |
+| Unix/current source | Windows form documented by command-line readme | Purpose | Source |
 |---|---|---|---|
 | `-h`, `--help` | `/help` | Print help. | `projectGenerator/commandLine/readme.md`, `projectGenerator/commandLine/src/main.cpp` |
 | `-o`, `--ofPath` | `/ofPath` | Set openFrameworks root; `PG_OF_PATH` is also supported. | same |
@@ -44,30 +44,40 @@ Current PG source lists these platform options: `android`, `ios`, `linux`, `linu
 
 Templates determine what can actually be generated for a local checkout. Source: `projectGenerator/commandLine/src/projects/baseProject.cpp`.
 
+### VS Code special case
+
+`--template="vscode"` is special-cased in current PG source: it clears the template name and adds `vscode` as a target platform. The matching files live under `openFrameworks/scripts/templates/vscode/`. Treat this as platform selection even though the CLI spelling uses `--template`.
+
+```bash
+projectGenerator --ofPath="$OF_ROOT" --template="vscode" "$OF_ROOT/apps/myApps/MyApp"
+```
+
+Source: `projectGenerator/commandLine/src/main.cpp`.
+
 ## Common recipes
 
 Create or update a normal app:
 
 ```bash
-pg --ofPath="$OF_ROOT" "$OF_ROOT/apps/myApps/MyApp"
+projectGenerator --ofPath="$OF_ROOT" "$OF_ROOT/apps/myApps/MyApp"
 ```
 
 Create/update with addons:
 
 ```bash
-pg --ofPath="$OF_ROOT" --addons="ofxGui,ofxOsc" "$OF_ROOT/apps/myApps/MyApp"
+projectGenerator --ofPath="$OF_ROOT" --addons="ofxGui,ofxOsc" "$OF_ROOT/apps/myApps/MyApp"
 ```
 
 List templates for macOS:
 
 ```bash
-pg --ofPath="$OF_ROOT" --platforms="osx" --listtemplates "$OF_ROOT/apps/myApps/TemplateProbe" --dryrun
+projectGenerator --ofPath="$OF_ROOT" --platforms="osx" --listtemplates "$OF_ROOT/apps/myApps/TemplateProbe" --dryrun
 ```
 
 Dry-run recursive update:
 
 ```bash
-pg --ofPath="$OF_ROOT" --recursive --dryrun "$OF_ROOT/apps/myApps"
+projectGenerator --ofPath="$OF_ROOT" --recursive --dryrun "$OF_ROOT/apps/myApps"
 ```
 
 Sources: `projectGenerator/commandLine/readme.md`, `projectGenerator/commandLine/src/main.cpp`.

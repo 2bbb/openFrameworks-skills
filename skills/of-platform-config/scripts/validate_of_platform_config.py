@@ -37,7 +37,7 @@ PROJECT_KEYS = {
 }
 ALL_KEYS = META_KEYS | PROJECT_KEYS
 ASSIGN_RE = re.compile(r"^([A-Za-z0-9_]+)\s*(\+?=)\s*(.*)$")
-SECTION_RE = re.compile(r"^([A-Za-z0-9_/]+):$")
+SECTION_RE = re.compile(r"^([A-Za-z0-9_/-]+):$")
 
 
 def strip_comment(line: str) -> str:
@@ -68,6 +68,12 @@ def validate_addon_config(path: Path) -> list[str]:
             errors.append(f"{path}:{lineno}: key '{key}' is not a verified meta key")
         if current != "meta" and key in META_KEYS and key != "ADDON_NAME":
             errors.append(f"{path}:{lineno}: metadata key '{key}' outside meta section")
+        if current == "osx" and key == "ADDON_XCFRAMEWORKS":
+            errors.append(
+                f"{path}:{lineno}: ADDON_XCFRAMEWORKS is parsed but absent from "
+                "projectGenerator's osx key whitelist; verify this PG version or "
+                "prefer automatic libs discovery/ADDON_LIBS"
+            )
     return errors
 
 
