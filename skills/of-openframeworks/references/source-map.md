@@ -12,8 +12,12 @@ When local source is available, prefer it over memory. Add source-path citations
 - `openFrameworks/scripts/templates/` — generated project templates and platform Makefile/config shapes.
 - `openFrameworks/tests/` — local test app patterns, including `ofAppNoWindow` and `ofxUnitTests` usage.
 
-## Additional local skill knowledge
+## Runtime/resource lookup
 
+- `openFrameworks/examples/threads/` and `openFrameworks/libs/openFrameworks/utils/ofThread*.h` — worker lifecycle, channels, and CPU/main-thread graphics handoff.
+- `openFrameworks/libs/openFrameworks/events/` — event order, listener tokens, legacy add/remove helpers, and frame timing counters.
+- `openFrameworks/libs/openFrameworks/utils/ofFileUtils.*` — data-root and path resolution behavior.
+- `openFrameworks/libs/openFrameworks/graphics/`, `openFrameworks/libs/openFrameworks/gl/`, and `openFrameworks/libs/openFrameworks/video/` — CPU/GPU resources, render state, FBO behavior, and media update lifecycle.
 
 ## Lookup strategy
 

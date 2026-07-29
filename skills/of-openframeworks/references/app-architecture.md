@@ -16,6 +16,7 @@ Practical guidance:
 - Treat `setup()` as one-time initialization, `update()` as state/time/input progression, and `draw()` as rendering. This is a useful processing-style model derived from the template shape; still inspect target project conventions before moving side effects.
 - Keep rendering-only code in `draw()` when possible. Avoid heavy blocking I/O, sleeps, or long asset loads in `draw()` because the main loop calls it repeatedly. Verify actual threading/event constraints in the target platform before changing behavior.
 - Preserve callback names and signatures exactly; generated project files and examples assume oF callback spellings.
+- When `ofApp` grows, split by ownership and lifecycle rather than merely by screen region: keep app/window callbacks as orchestration, let input/media/services own their resources and shutdown, and let render helpers own only the draw state they can restore. Load `runtime-and-resources.md` before moving work to threads or sharing GPU objects.
 
 ## `std` and namespace practice
 
@@ -46,6 +47,8 @@ Use this when each window has its own app lifecycle and ownership. Keep cross-wi
 `multiWindowOneAppExample` creates main and GUI windows, can share OpenGL resources with `settings.shareContextWith`, disables v-sync on the GUI window, creates one `ofApp`, calls `setupGui()`, and attaches a GUI-window draw listener with `ofAddListener(guiWindow->events().draw, mainApp.get(), &ofApp::drawGui)`. Source: `openFrameworks/examples/windowing/multiWindowOneAppExample/src/main.cpp`.
 
 Use this when one app owns model/state and an auxiliary window is only another view/control surface. When touching OpenGL objects across windows, inspect whether `shareContextWith` is required in the target oF/GLFW setup.
+
+Window ownership, event-listener ownership, and OpenGL context sharing are separate decisions. A shared context can make selected GL resources visible across windows, but it does not manage C++ object or listener lifetime. Store auxiliary listeners on an owner that outlives their callbacks; load `runtime-and-resources.md` for token and legacy-listener patterns.
 
 ## Apple Objective-C++ boundaries
 

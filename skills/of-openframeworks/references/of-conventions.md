@@ -11,8 +11,9 @@ Use local source as the authority for signatures, names, and ownership. These no
 
 ## Resources and assets
 
-- Many examples load assets from `bin/data` or save output through oF file/image APIs; verify the target project's data paths before moving assets. Sources: `openFrameworks/examples/*/*/bin/data`, `openFrameworks/examples/input_output/`, `openFrameworks/examples/graphics/`.
-- For GPU/media objects, check the local class header/source for required `allocate()`, `load()`, `isAllocated()`, `clear()`, or similar lifecycle calls before changing ownership. Source: `openFrameworks/libs/openFrameworks/`.
+- Many examples load assets from `bin/data` or save output through oF file/image APIs. Use `ofToDataPathFS(path, true)` when a non-oF API needs an absolute path; do not hardcode a launch-directory assumption. Source: `openFrameworks/libs/openFrameworks/utils/ofFileUtils.h`.
+- For GPU/media objects, check the local class header/source for required `allocate()`, `load()`, `update()`, `isFrameNew()`, `isAllocated()`, `close()`, or `clear()` calls before changing ownership. Source: `openFrameworks/libs/openFrameworks/`.
+- Load `runtime-and-resources.md` for detailed data-path, thread handoff, event lifetime, timing, video, and render-state guidance.
 
 ## Logging and diagnostics
 

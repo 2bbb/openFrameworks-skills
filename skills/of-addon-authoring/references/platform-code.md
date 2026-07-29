@@ -58,6 +58,7 @@ Do not expose Objective-C types in public addon headers. Headers are included by
 
 class ofxYourAddon {
 public:
+	~ofxYourAddon();
 	void setup();
 private:
 	class Impl;
@@ -74,9 +75,20 @@ class ofxYourAddon::Impl {
 public:
 	id<MTLDevice> device = MTLCreateSystemDefaultDevice();
 };
+
+ofxYourAddon::~ofxYourAddon() = default;
 ```
 
 Also add Apple-only source exclusions for other platforms. The evidence from `ofxiOS.h` is direct: any `.cpp` files including it must be renamed to `.mm` for Objective-C++ support; therefore avoid making ordinary users include such headers unless the whole target intentionally uses ObjC++.
+
+When renaming an implementation between `.cpp` and `.mm`, first confirm that:
+
+- the old filename is absent from generated project files and addon declarations;
+- the new `.mm` file is discovered for Apple targets;
+- Apple sources are excluded from non-Apple targets;
+- required Apple frameworks are present in the correct `addon_config.mk` section.
+
+Then update/regenerate generated IDE membership and perform a clean rebuild to flush stale project, object, and dependency state. Project Generator classifies `.mm` as Objective-C++ source, while the make path generates `.d` dependency files beside object files and its `clean` target removes project/addon objects and the project object-output tree. Sources: `projectGenerator/commandLine/src/projects/xcodeProject.h`, `projectGenerator/commandLine/src/projects/baseProject.cpp`, `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk`.
 
 
 ## Public C++ API, private Apple implementation
