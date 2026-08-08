@@ -1,6 +1,6 @@
 ---
 name: of-build-test
-description: Build, run, test, log, and visually verify openFrameworks apps/addons. Use when Codex needs practical oF make build commands, stdout/stderr capture, macOS .app execution, Linux xvfb/headless execution, ofSaveScreen/ofSaveImage capture, or ofxUnitTests run patterns for local verification.
+description: Build, run, test, benchmark, log, and visually verify openFrameworks apps/addons. Use when Codex needs practical oF make build commands, layered verification-gate selection, deterministic self-terminating smoke runs, stdout/stderr capture, macOS .app execution, Linux xvfb/headless execution, ofSaveScreen/ofSaveImage artifacts, performance evidence, or ofxUnitTests patterns.
 license: MIT
 ---
 
@@ -17,7 +17,8 @@ Use this skill to turn an oF project or addon test app into a verified build/run
    skills/of-build-test/scripts/of-build-run.sh --project path/to/app --target Debug --run --log-dir build-logs
    ```
 4. Inspect both exit code and generated logs before claiming success.
-5. For visual verification, make the app save an artifact from `draw()` or an FBO readback, then run the app and inspect the output image.
+5. Match verification layers to the claim: static checks, pure/headless tests, public-header compile, Debug/Release builds, runtime smoke, visual artifact, and performance measurement are separate evidence.
+6. For visual verification, make the app save an artifact from `draw()` or an FBO readback, emit an explicit result marker, call `ofExit(status)`, then inspect exit status, logs, and image output.
 
 ## Command patterns
 

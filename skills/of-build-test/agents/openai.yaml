@@ -1,4 +1,4 @@
 interface:
   display_name: "oF Build/Test"
-  short_description: "Build, run, log, and visually verify openFrameworks projects."
-  default_prompt: "Use $of-build-test to build, run, capture logs, and verify this openFrameworks app or addon test project."
+  short_description: "Build, test, benchmark, and visually verify oF projects"
+  default_prompt: "Use $of-build-test to select layered checks, build and run this openFrameworks project, capture logs/artifacts, and produce evidence-backed verification."

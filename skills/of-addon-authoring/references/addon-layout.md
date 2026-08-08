@@ -1,6 +1,15 @@
 # Addon Layout and Project Files
 
-Source basis:
+## Contents
+
+- [Source basis](#source-basis)
+- [Recommended Tree](#recommended-tree)
+- [`addons.make` vs `addon_config.mk`](#addonsmake-vs-addon_configmk)
+- [Local Addons](#local-addons)
+- [Bundled Libs](#bundled-libs)
+- [Examples and `testApp`](#examples-and-testapp)
+
+## Source basis
 
 - `projectGenerator/commandLine/src/main.cpp` parses `addons.make` when updating a project (around `updateProject`).
 - `projectGenerator/commandLine/src/projects/baseProject.cpp` reads `projectDir/addons.make` in `parseAddons()` and sends each non-comment line to `addAddon()`.
@@ -74,6 +83,40 @@ Example from a project directory:
 ```
 
 Preserve the user's exact `addons.make` entry where possible; projectGenerator stores `addonMakeName` before cleaning comments.
+
+### Dev host, independent addon, and nested dependencies
+
+A practical development shape is:
+
+```text
+MyAddonDev/
+  Makefile
+  config.make
+  addons.make
+  src/                   # host app used for integration and visual checks
+  bin/data/              # tracked runtime fixtures only; ignore generated output
+  local_addons/
+    ofxMyAddon/           # independently versioned addon
+      addon_config.mk
+      src/
+      libs/
+        upstream/         # vendored tree or nested submodule
+```
+
+`local_addons` is a convention, not a Project Generator requirement. PG treats an `addons.make` entry with a parent path as local when that path exists relative to the project directory. Source: `projectGenerator/commandLine/src/addons/ofAddon.cpp`.
+
+Use this split when the host app is a verification client rather than part of the addon API. Keep reusable code, examples, licenses, and dependency metadata in the addon repository; keep application-only orchestration and test assets in the host.
+
+If the addon or an upstream dependency is a Git submodule:
+
+- record a portable remote URL in `.gitmodules`, not a developer-machine filesystem path;
+- initialize nested dependencies with `git submodule update --init --recursive`;
+- inspect `git submodule status --recursive` before builds and releases;
+- commit the addon/upstream change first, then commit the updated gitlink in its parent repository.
+
+Git documents that `--recursive` updates nested submodules and that the superproject records a specific submodule commit. Source: `https://git-scm.com/docs/git-submodule`.
+
+Do not require submodules when a release archive or package-manager dependency is a better consumer experience. If using them, document clone/update commands in the consuming project's README and exercise a clean recursive checkout in CI or release verification.
 
 ## Bundled Libs
 

@@ -6,8 +6,8 @@ Codex skills for building, debugging, reviewing, and maintaining openFrameworks 
 
 - `of-openframeworks` — core oF app architecture, `ofApp` lifecycle, source lookup, data paths, threading/live-frame handoff, events, CPU/GPU resources, timing, video, logging, namespaces, multi-window patterns, and general oF good/bad know-how.
 - `of-project-generator` — Project Generator CLI discovery, project creation/update, addons, templates, and generated files.
-- `of-build-test` — local build/smoke/unit-test workflows for oF projects.
-- `of-addon-authoring` — addon layout, `addon_config.mk`, examples, tests, dependencies, and packaging.
+- `of-build-test` — layered local build/test, deterministic visual smoke, artifact capture, and performance-evidence workflows.
+- `of-addon-authoring` — addon layout, local-addon/dev-host patterns, `addon_config.mk`, upstream source/prebuilt dependency boundaries, examples, tests, and packaging.
 - `of-platform-config` — platform sections, generated config files, and platform-specific build settings.
 - `of-shader-glsl` — oF OpenGL/GLSL shader, texture, renderer, and asset checks.
 - `of-ci` — `2bbb/of-actions`, custom CI, ofxUnitTests, and validation flow for oF addons/apps and oF itself.

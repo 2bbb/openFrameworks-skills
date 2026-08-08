@@ -1,6 +1,17 @@
 # `addon_config.mk` Reference
 
-Source basis:
+## Contents
+
+- [Source basis](#source-basis)
+- [Source-Verified Sections](#source-verified-sections)
+- [Source-Verified Keys](#source-verified-keys)
+- [Assignment Semantics](#assignment-semantics)
+- [Common Template](#common-template)
+- [Exclusions](#exclusions)
+- [Upstream source or prebuilt backend](#upstream-source-or-prebuilt-backend)
+- [Platform Notes](#platform-notes)
+
+## Source basis
 
 - `projectGenerator/commandLine/src/addons/ofAddon.h` defines parser states, metadata keys, and project variable constants.
 - `projectGenerator/commandLine/src/addons/ofAddon.cpp` parses sections, supports `=` and `+=`, splits values on spaces or quoted groups, prefixes relative paths with the addon path, and applies exclusions.
@@ -147,6 +158,38 @@ linux64:
 - `openFrameworks/addons/ofxOpenCv/addon_config.mk` excludes `libs/opencv/%` for system package builds.
 
 Do not use `*` in `ADDON_SOURCES_EXCLUDE`, `ADDON_INCLUDES_EXCLUDE`, `ADDON_LIBS_EXCLUDE`, or `ADDON_FRAMEWORKS_EXCLUDE`. Use `%`.
+
+## Upstream source or prebuilt backend
+
+Choose the integration boundary deliberately instead of letting recursive discovery decide it accidentally.
+
+Compile upstream source through the addon when:
+
+- the source set is small and portable;
+- required compile flags are expressible in `addon_config.mk`;
+- the target project should rebuild that dependency with its own toolchain;
+- samples, tests, tools, and unsupported backends can be excluded precisely.
+
+Link a prebuilt/static backend when:
+
+- upstream has its own substantial build system or generated configuration;
+- recursive discovery would pull in mutually exclusive backends, tools, tests, or platform code;
+- build time or IDE indexing becomes unreasonable;
+- one audited library artifact gives a clearer boundary than hundreds of upstream translation units.
+
+For a prebuilt boundary:
+
+1. Keep the thin oF-facing wrapper in `src/`.
+2. Put public upstream headers under `libs/<name>/include` or add their exact include directory.
+3. Exclude upstream source trees with `ADDON_SOURCES_EXCLUDE += libs/<name>/src/%` when they remain in the distribution.
+4. Add the actual library through `ADDON_LIBS` or the conventional platform library folders.
+5. Add required system frameworks/libraries in platform sections.
+6. Record the upstream version, license, architectures, deployment target, C++ runtime/ABI assumptions, and the reproducible command that built the artifact.
+7. Verify both the make path and every generated IDE project promised by the addon.
+
+PG recursively scans addon `src/` and `libs/`, then applies source/library exclusions; the oF make layer similarly discovers source under `libs/`, gathers platform libraries, and links `PROJECT_ADDONS_LIBS`. Sources: `projectGenerator/commandLine/src/addons/ofAddon.cpp`, `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/config.addons.mk`, `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk`.
+
+Do not ship a prebuilt artifact without its matching headers/license or assume a binary built for one architecture/configuration is portable to another. Prefer reproducible build scripts and checksums for generated artifacts.
 
 ## Platform Notes
 

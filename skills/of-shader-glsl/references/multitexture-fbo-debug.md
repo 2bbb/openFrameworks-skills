@@ -18,6 +18,19 @@ The local `multiTextureShaderExample` shows a full C++/shader pattern:
 - The alpha-mask example allocates a mask FBO, draws into it with `maskFbo.begin()`/`maskFbo.end()`, then passes it to the shader with `shader.setUniformTexture("maskTex", maskFbo.getTexture(), 0)`. Source: `openFrameworks/examples/shader/07_fboAlphaMaskExample/src/ofApp.cpp`.
 - The same example passes `uMaskSize` from `maskFbo.getWidth()`/`maskFbo.getHeight()` and separately passes sample texture size, then remaps coordinates in the fragment shader before sampling multiple textures. Sources: `openFrameworks/examples/shader/07_fboAlphaMaskExample/src/ofApp.cpp`, `openFrameworks/examples/shader/07_fboAlphaMaskExample/bin/data/shadersGL3/shader.frag`.
 
+## Composable postprocess and copy passes
+
+When a shader/FBO pass becomes one layer in a larger engine, make these contracts explicit:
+
+- **Input lifetime:** every sampled texture must remain alive and allocated through the draw. Required inputs should fail visibly when missing. For a sampler explicitly defined as optional, gate the source with `isAllocated()`, log/test both present and missing paths, and keep a real, long-lived allocated fallback texture when the shader contract still requires a binding.
+- **Texture units:** assign units centrally for the whole pass/engine. `setUniformTexture()` binds the requested unit; two helpers choosing the same unit can overwrite each other's assumptions. Sources: `openFrameworks/libs/openFrameworks/gl/ofShader.cpp`, `openFrameworks/examples/gl/multiTextureShaderExample/src/ofApp.cpp`.
+- **Render target ownership:** pair every `fbo.begin()`/`end()` and do not reuse a shared scratch FBO from nested save/render paths unless reentrancy is designed and tested.
+- **Raw blits:** prefer oF renderer/FBO helpers. If calling `glBlitFramebuffer` directly, bind the intended read and draw framebuffers explicitly and restore the surrounding framebuffer state. oF's multisample resolve path calls renderer `bindForBlitting()` before the blit and `unbind()` afterward. Sources: `openFrameworks/libs/openFrameworks/gl/ofFbo.cpp`, `https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBlitFramebuffer.xhtml`.
+- **Alpha and draw state:** choose the clear alpha and blend/depth behavior for each pass, then restore state before returning. An opaque clear is a semantic decision, not a neutral reset for a transparent pipeline.
+- **Allocation cost:** allocate feedback/intermediate FBOs lazily or on size/format changes, not unconditionally each frame; release them with the owning layer.
+
+For a new renderer/layer kind, audit all integration surfaces together: creation, update/draw, input routing, duplication, parameter animation, save/restore, RPC/control handlers, and output capture. A successful standalone shader does not prove those engine-level paths.
+
 ## Coordinate and origin traps with local evidence
 
 Only use these as diagnostics when the target code resembles the cited source.

@@ -1,5 +1,18 @@
 # openFrameworks build/test guide
 
+## Contents
+
+- [Evidence map](#evidence-map)
+- [Build commands](#build-commands)
+- [Capturing stdout/stderr](#capturing-stdoutstderr)
+- [Running built apps](#running-built-apps)
+- [ofxUnitTests pattern](#ofxunittests-pattern)
+- [Layered addon verification](#layered-addon-verification)
+- [Deterministic visual smoke mode](#deterministic-visual-smoke-mode)
+- [Visual capture](#visual-capture)
+- [Performance evidence](#performance-evidence)
+- [Project generator refresh](#project-generator-refresh)
+
 ## Evidence map
 
 This guide is grounded only in the following local evidence:
@@ -126,6 +139,39 @@ int main(){
 
 Macros grounded in `ofxUnitTests.h`: `ofxTest`, `ofxTestEq`, `ofxTestGt`, `ofxTestLt`.
 
+## Layered addon verification
+
+Do not let one green build stand in for every contract. Select the smallest layers that prove the change:
+
+1. **Repository/static checks** — `git diff --check`, configuration validators, source-citation or packaging checks.
+2. **Pure C++ tests** — algorithms, parsers, math, queue policies, and serialization that do not need an oF window.
+3. **Public-header compile** — compile a tiny translation unit that includes the public umbrella header with the documented C++ standard and warnings enabled. This catches incomplete types, leaked ObjC/platform headers, missing includes, and accidental reliance on include order.
+4. **Sanitizer/static analysis** — run on the smallest target that exercises memory, bounds, lifetime, and undefined-behavior risks when the local compiler supports it. Treat availability as platform/toolchain-specific.
+5. **oF Debug/Release build** — build the minimal test app and every example affected by the API change. Debug and Release are distinct configurations in the oF make layer.
+6. **Runtime smoke** — require an explicit success/failure oracle, timeout, and captured logs.
+7. **Visual evidence** — inspect a deterministic screenshot or FBO artifact when correctness includes rendering, alpha, fill/blend/depth state, or interaction-visible behavior.
+8. **Performance evidence** — only when the claim is about throughput, latency, allocation, or frame time.
+
+For an addon example portfolio, prefer focused examples that each prove one API area over one large demo that makes failures hard to localize. Keep one minimal example suitable for build smoke.
+
+The oF repository supplies `ofAppNoWindow`/`ofxUnitTests`, separate Debug/Release make targets, and image capture APIs; sanitizer, analyzer, and public-header targets are addon-owned gates rather than universal oF targets. Sources: `openFrameworks/tests/`, `openFrameworks/addons/ofxUnitTests/src/ofxUnitTests.h`, `openFrameworks/libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk`, `openFrameworks/libs/openFrameworks/utils/ofUtils.h`.
+
+## Deterministic visual smoke mode
+
+For a windowed app that must be tested repeatedly, add an opt-in mode owned by the app rather than relying on an agent to close it manually:
+
+1. Parse an explicit argument in `main(int argc, char** argv)` such as `--smoke-test`; pass the resulting flag into `ofApp` through its constructor or setup state.
+2. Wait for a deterministic readiness condition: required resources allocated, first valid input/frame available, or a bounded warm-up frame count reached.
+3. Render the target state in `draw()`.
+4. Save the screen/FBO to a stable, ignored artifact path.
+5. Log a unique success/failure marker and call `ofExit(0)` or `ofExit(nonzero)`.
+6. Run the exact executable under an external timeout and capture stdout/stderr separately.
+7. Verify process status, marker uniqueness, artifact existence/nonzero size, and pixels when the visual contract requires it.
+
+`ofSaveScreen()` reads the current GL viewport and saves pixels. `ofExit(status)` asks the main loop to close with that status, and `ofMainLoop::loop()` returns it after exit callbacks. Sources: `openFrameworks/libs/openFrameworks/utils/ofUtils.h`, `openFrameworks/libs/openFrameworks/utils/ofUtils.cpp`, `openFrameworks/libs/openFrameworks/app/ofAppRunner.cpp`, `openFrameworks/libs/openFrameworks/app/ofMainLoop.cpp`.
+
+Guard the capture so it runs once. Do not use only a fixed sleep when readiness can be observed, and always keep an external timeout for failed initialization. Put generated captures/logs outside tracked source or add exact ignore rules; never ignore hand-authored fixture/reference images accidentally.
+
 ## Visual capture
 
 Use the simplest capture that matches the app:
@@ -135,7 +181,21 @@ Use the simplest capture that matches the app:
 - Numbered PNG frame: `ofSaveFrame()`.
 - FBO/high-res output: read the FBO to pixels and call `ofSaveImage(pixels, path, OF_IMAGE_QUALITY_BEST)`.
 
-For automated verification, save to a stable path under `bin/data` or another known output directory, run the app long enough to emit the file, then inspect file existence, size, and pixels if needed.
+For automated verification, prefer `build-logs/`, a temporary test-artifact directory, or another generated-output path outside the runtime asset tree. If the app must write through oF's data path, use an explicitly ignored subdirectory such as `bin/data/test-artifacts/`, not the same folders that hold tracked runtime assets. Then inspect file existence, size, and pixels if needed.
+
+## Performance evidence
+
+Before claiming an optimization:
+
+- define the metric and unit, and distinguish producer throughput, end-to-end latency, GPU time, CPU time, allocation count, and dropped work;
+- preserve correctness checks alongside timing so a faster empty/incorrect path cannot pass;
+- capture environment facts that affect interpretation: build configuration, platform/device, resolution/work size, VSync/target FPS, and relevant queue depth;
+- use warm-up plus repeated samples and report the sample set or summary method, not only the best run;
+- store a structured result artifact when practical, then compare baseline and candidate under the same harness;
+- document backpressure, dropped frames, final drain, and synchronization points for asynchronous/ring-buffer paths;
+- state whether a result improves throughput, latency, or both. A deferred/ring path can improve producer overlap without reducing final completion latency.
+
+Keep absolute performance numbers project-local. Reusable skill guidance should describe the measurement contract, not promise results for other hardware.
 
 ## Project generator refresh
 

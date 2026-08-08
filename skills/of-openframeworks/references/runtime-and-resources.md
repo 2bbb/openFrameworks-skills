@@ -8,6 +8,7 @@ Use this reference when an oF app loads assets, moves work off the main thread, 
 - [CPU and GPU resource boundaries](#cpu-and-gpu-resource-boundaries)
 - [Threads and frame handoff](#threads-and-frame-handoff)
 - [Event listener lifetime](#event-listener-lifetime)
+- [Parameters and state round-trip](#parameters-and-state-round-trip)
 - [Frame timing and vertical sync](#frame-timing-and-vertical-sync)
 - [Streaming video lifecycle](#streaming-video-lifecycle)
 - [Render-state isolation](#render-state-isolation)
@@ -177,6 +178,40 @@ Removal uses the event, listener/function, method, and priority identity. Keep t
 
 Event priorities are `OF_EVENT_ORDER_BEFORE_APP`, `OF_EVENT_ORDER_APP`, and `OF_EVENT_ORDER_AFTER_APP`. Do not change priority merely to hide an ownership or ordering bug. Source: `openFrameworks/libs/openFrameworks/events/ofEvent.h`.
 
+## Parameters and state round-trip
+
+`ofParameterGroup` can be serialized recursively through oF's JSON or XML helpers. Parameter/group names form the persisted keys, and parameters marked non-serializable are skipped. Sources: `openFrameworks/libs/openFrameworks/utils/ofJson.h`, `openFrameworks/libs/openFrameworks/utils/ofXml.cpp`, `openFrameworks/libs/openFrameworks/types/ofParameter.h`.
+
+Minimal JSON pattern:
+
+```cpp
+ofParameterGroup settings;
+ofParameter<float> amount{"amount", 0.5f, 0.0f, 1.0f};
+
+settings.setName("settings");
+settings.add(amount);
+
+ofJson saved;
+ofSerialize(saved, settings);
+ofSavePrettyJson("settings.json", saved);
+
+const auto loaded = ofLoadJson("settings.json");
+ofDeserialize(loaded, settings);
+```
+
+Source API: `openFrameworks/libs/openFrameworks/utils/ofJson.h`. An equivalent XML workflow is demonstrated by `openFrameworks/examples/gui/parameterGroupExample/src/ofApp.cpp`.
+
+Treat persistence as a schema contract:
+
+- give every persisted group/parameter a stable semantic name;
+- serialize the discriminator/type/mode needed to reconstruct behavior, not only shared values;
+- make new fields optional or version/migrate the document when old state must still load;
+- test save → load → save round-trip and behavior restoration, not merely parse success;
+- decide whether listeners should react during bulk restore; if callbacks trigger expensive or order-sensitive work, use the parameter event controls or an application-level restoring guard deliberately;
+- keep transient GPU handles, pointers, callbacks, and runtime-only caches out of persisted state.
+
+`ofDeserialize()` looks up parameters by escaped name and ignores missing keys, while assigning found values through parameter conversion. Exact type conversion and listener behavior should be tested for the target parameter set. Source: `openFrameworks/libs/openFrameworks/utils/ofJson.h`.
+
 ## Frame timing and vertical sync
 
 Distinguish measured timing from requested limits:
@@ -257,6 +292,7 @@ Before accepting an oF runtime change:
 - [ ] A live-frame queue has a documented drop/backpressure policy.
 - [ ] Blocking worker waits can be released during shutdown, and threads are joined before referenced state is destroyed.
 - [ ] Every event listener has a visible owner and unsubscription path.
+- [ ] Persisted parameter/state names are stable, discriminators are included, and round-trip behavior is tested.
 - [ ] Texture/image/FBO allocation handles initial size and supported size/format changes.
 - [ ] `update()` advances video/capture state; `isFrameNew()` gates per-frame downstream work.
 - [ ] Frame-rate calculations use measured delta where appropriate; VSync and target FPS are not conflated.

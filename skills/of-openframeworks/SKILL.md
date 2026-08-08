@@ -1,6 +1,6 @@
 ---
 name: of-openframeworks
-description: Core openFrameworks C++ app and runtime guidance. Use when Codex needs to write, review, debug, or refactor ofApp/setup-update-draw code; work with threads, live-frame handoff, data paths, events/listeners, frame timing, video, CPU/GPU resources, multi-window apps, logging, namespaces/std usage, or source-backed oF lifecycle conventions. For addon packaging/config, Project Generator, build/test, shader/GLSL, platform config, or CI changes, use the corresponding dedicated oF skill.
+description: Core openFrameworks C++ app and runtime guidance. Use when Codex needs to write, review, debug, or refactor ofApp/setup-update-draw code; work with threads, live-frame handoff, data paths, events/listeners, ofParameter/ofParameterGroup serialization, JSON/XML settings persistence, state round-trip, frame timing, video, CPU/GPU resources, multi-window apps, logging, namespaces/std usage, or source-backed oF lifecycle conventions. For addon packaging/config, Project Generator, build/test, shader/GLSL, platform config, or CI changes, use the corresponding dedicated oF skill.
 ---
 
 # openFrameworks
@@ -23,7 +23,7 @@ For specialized work, also load the narrow owner skill: `of-addon-authoring`, `o
 ## Load references as needed
 
 - `references/app-architecture.md` — source-backed `ofApp`, processing-style lifecycle, multi-window, namespace/std, and logging guidance.
-- `references/runtime-and-resources.md` — data paths, CPU/GPU ownership, threads/channels, event-listener lifetime, frame timing/VSync, streaming media, and render-state isolation.
+- `references/runtime-and-resources.md` — data paths, CPU/GPU ownership, threads/channels, event-listener lifetime, `ofParameterGroup` JSON/XML persistence and state round-trip, frame timing/VSync, streaming media, and render-state isolation.
 - `references/of-conventions.md` — source-backed API/lifecycle, assets, OpenGL/GLSL checks, and file-splitting caveats.
 - `references/build-and-addons.md` — source-backed `addons.make`, `addon_config.mk`, platform sections, Project Generator interactions, build/test basics.
 - `references/source-map.md` — where to inspect local oF docs/source/examples/bundled addons before making claims.
