@@ -14,7 +14,25 @@ Codex skills for building, debugging, reviewing, and maintaining openFrameworks 
 
 ## Install
 
-Copy the desired skill directories into your Codex skills directory, or install this repository as a skill source if your Codex setup supports repo-based skill installation.
+List the available skills:
+
+```bash
+npx skills add 2bbb/openFrameworks-skills --list
+```
+
+Install one skill globally for Codex:
+
+```bash
+npx skills add 2bbb/openFrameworks-skills --skill of-openframeworks -g -a codex -y
+```
+
+Install all skills globally for Codex:
+
+```bash
+npx skills add 2bbb/openFrameworks-skills --skill '*' -g -a codex -y
+```
+
+Omit `-g` for project-local installation. You can also copy selected `skills/<name>` directories into the skill directory used by your agent.
 
 The mirrored source trees used to build these skills are intentionally not distributed. Skill text cites portable upstream path hints such as `openFrameworks/examples/...`; after installation, verify those against the target local openFrameworks checkout.
 
