@@ -9,6 +9,8 @@
 ## Before running PG
 
 1. Locate the executable with `scripts/locate_project_generator.py`; the script reports candidates and does not execute them. Source: `skills/of-project-generator/scripts/locate_project_generator.py`.
+   - On macOS, reject `*.app/Contents/MacOS/projectGenerator`: that is the Electron GUI shell, not the CLI generator.
+   - Prefer `*.app/Contents/Resources/app/app/projectGenerator` for a packaged release, or `commandLine/bin/projectGenerator` for a source build. Sources: `projectGenerator/frontend/readme.md`, `projectGenerator/scripts/osx/ci_build_pg.sh`.
 2. Run `--help`, `--version`, `--getplatform`, or `--getofpath` when executable compatibility/path resolution matters. Source: `projectGenerator/commandLine/src/main.cpp`.
 3. For an existing project, inspect `addons.make`, `config.make`, `Makefile`, and current generated IDE files. Sources: `openFrameworks/docs/msys2.md`, `openFrameworks/scripts/templates/`.
 4. Run `--dryrun` for recursive updates or unfamiliar generated-file changes; PG docs warn about recursive updates and suggest dry-run. Source: `projectGenerator/commandLine/readme.md`.
@@ -30,12 +32,20 @@ Review changed generated files before editing code that depends on them:
 - It rejects `--of-root` unless it contains `libs/`, `addons/`, and `scripts/`.
 - It searches candidate names by host platform (`projectGenerator`, `commandLine`, and `.exe` variants as applicable), `PG_OF_PATH`, extra roots, and existing executables on `PATH`.
 - It prints a preferred executable candidate if one exists; otherwise it returns non-zero for `--first`/`--json` and normal output.
+- It reports the outer macOS Electron executable as `unsafe-gui` and never selects it as the preferred automation target.
 
 Source: `skills/of-project-generator/scripts/locate_project_generator.py`.
 
 Path variants in the script are supported by local evidence that PG can live in source `apps/projectGenerator/commandLine/bin`, packaged `projectGenerator/` folders, Electron app resources, and installed `PATH` locations. Sources: `projectGenerator/README.md`, `projectGenerator/frontend/readme.md`, `openFrameworks/scripts/of.sh`, `openFrameworks/scripts/linux/compilePG.sh`, `openFrameworks/scripts/dev/download_pg.sh`.
 
+## macOS Electron crash signature
+
+If a crash report ends in `abort -> _RegisterApplication -> GetCurrentProcess -> NSApplication sharedApplication -> ElectronMain`, PG has not reached project parsing. The process being launched is the Electron GUI, and AppKit failed while registering it with LaunchServices. This is especially reproducible when a GUI executable is spawned directly inside a restricted agent sandbox. Do not retry the same binary: switch to the embedded/source command-line PG. This diagnosis is consistent with the PG frontend being Electron and merely wrapping the separate command-line utility. Sources: `projectGenerator/frontend/readme.md`, `projectGenerator/frontend/index.js`, `projectGenerator/scripts/osx/ci_build_pg.sh`.
+
+External corroboration: [openai/codex#30043](https://github.com/openai/codex/issues/30043) reproduces this macOS registration abort for GUI applications launched from a Codex sandbox, and [electron/electron#52815](https://github.com/electron/electron/issues/52815) traces the same pre-JavaScript abort to unavailable LaunchServices registration.
+
 ## Avoid
 
 - Do not recursively update an entire oF checkout unless explicitly requested. Source: `projectGenerator/commandLine/readme.md`.
 - Do not hand-edit generated IDE files before checking whether the real issue is addon/source/template input that PG should regenerate. Source: `openFrameworks/docs/projectgenerator.md`, `projectGenerator/commandLine/readme.md`.
+- Do not probe the outer Electron executable with CLI flags. Even harmless-looking probes such as `--help` initialize Electron/AppKit before the embedded PG can be used.

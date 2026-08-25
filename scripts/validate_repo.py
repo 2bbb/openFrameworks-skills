@@ -161,6 +161,10 @@ def validate_platform_config_guard() -> None:
         fail("platform config validator did not reject unsupported osx ADDON_XCFRAMEWORKS")
 
 
+def validate_project_generator_locator() -> None:
+    run([sys.executable, "skills/of-project-generator/scripts/test_locate_project_generator.py"])
+
+
 def validate_agents() -> None:
     agent = ROOT / "agents/openai.yaml"
     if not agent.is_file():
@@ -179,6 +183,7 @@ def main() -> int:
     validate_help()
     validate_ci_templates()
     validate_platform_config_guard()
+    validate_project_generator_locator()
     validate_agents()
     run(["python3", "skills/of-openframeworks/scripts/check_source_citations.py"])
     print("OK: repository validation passed")

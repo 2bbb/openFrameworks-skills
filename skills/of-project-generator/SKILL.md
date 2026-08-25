@@ -11,6 +11,8 @@ Use this skill to safely run or advise on the openFrameworks Project Generator (
 
 1. Locate the oF root. Local PG source accepts an oF root with `libs/`, `addons/`, and `scripts/`. Source: `projectGenerator/commandLine/src/main.cpp`.
 2. Locate a PG executable with `scripts/locate_project_generator.py` before guessing paths. The locator only reports candidates; it does not execute PG. Source: `skills/of-project-generator/scripts/locate_project_generator.py`.
+   - On macOS, automate the command-line binary, not the Electron frontend at `*.app/Contents/MacOS/projectGenerator`.
+   - A packaged app normally embeds the CLI at `*.app/Contents/Resources/app/app/projectGenerator`. Sources: `projectGenerator/frontend/readme.md`, `projectGenerator/scripts/osx/ci_build_pg.sh`.
 3. Use explicit `--ofPath`/`/ofPath` or `PG_OF_PATH`; PG docs/source support both and also try local path resolution. Sources: `projectGenerator/commandLine/readme.md`, `projectGenerator/commandLine/src/main.cpp`.
 4. Dry-run first for recursive updates or unfamiliar/generated-file changes. PG command-line docs warn that recursive is aggressive and suggest dry-run. Source: `projectGenerator/commandLine/readme.md`.
 5. Regenerate only the intended project directory unless the user explicitly requested recursive update. Source: `projectGenerator/commandLine/readme.md`.
@@ -23,6 +25,8 @@ python3 path/to/skills/of-project-generator/scripts/locate_project_generator.py 
 ```
 
 The script prints candidate executables and marks the preferred existing executable. Use `--json` for machine-readable output. Candidate paths are script-defined and based on local source/release path evidence from `projectGenerator/README.md`, `projectGenerator/frontend/readme.md`, `openFrameworks/scripts/of.sh`, `openFrameworks/scripts/linux/compilePG.sh`, and `openFrameworks/scripts/dev/download_pg.sh`.
+
+On macOS, `unsafe-gui` means the candidate is the outer Electron application executable. Never invoke that path for project generation, `--help`, or version probing. Under a restricted agent sandbox it can abort during AppKit/LaunchServices registration before PG processes arguments. Select the embedded command-line binary instead. If the user explicitly wants the GUI, launch the `.app` through an approved GUI/LaunchServices path rather than executing `Contents/MacOS/projectGenerator` as a child process.
 
 ## CLI essentials
 
