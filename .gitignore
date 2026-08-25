@@ -62,3 +62,7 @@ MobileBackups.trash
 tmbootpicker.efi
 
 working-docs/
+
+# Python validation artifacts
+__pycache__/
+*.py[cod]
